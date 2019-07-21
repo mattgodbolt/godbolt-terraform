@@ -19,18 +19,18 @@ resource "aws_s3_bucket" "bbc-godbolt-org" {
 }
 
 locals {
-  prod_origin_id = "S3-bbc.godbolt.org"
-  beta_origin_id = "S3-bbc.godbolt.org/beta"
+  jsbeeb_prod_origin_id = "S3-bbc.godbolt.org"
+  jsbeeb_beta_origin_id = "S3-bbc.godbolt.org/beta"
 }
 
 resource "aws_cloudfront_distribution" "bbc-godbolt-org" {
   origin {
     domain_name = aws_s3_bucket.bbc-godbolt-org.bucket_domain_name
-    origin_id   = local.prod_origin_id
+    origin_id   = local.jsbeeb_prod_origin_id
   }
   origin {
     domain_name = aws_s3_bucket.bbc-godbolt-org.bucket_domain_name
-    origin_id   = local.beta_origin_id
+    origin_id   = local.jsbeeb_beta_origin_id
     origin_path = "/beta"
   }
 
@@ -74,7 +74,7 @@ resource "aws_cloudfront_distribution" "bbc-godbolt-org" {
       query_string = false
     }
     path_pattern           = "/beta*"
-    target_origin_id       = local.beta_origin_id
+    target_origin_id       = local.jsbeeb_beta_origin_id
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
   }
@@ -100,7 +100,7 @@ resource "aws_cloudfront_distribution" "bbc-godbolt-org" {
       }
       query_string = false
     }
-    target_origin_id       = local.prod_origin_id
+    target_origin_id       = local.jsbeeb_prod_origin_id
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
   }
