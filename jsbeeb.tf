@@ -133,3 +133,29 @@ resource "aws_s3_bucket_policy" "bbc-godbolt-org" {
     Version   = "2012-10-17"
   })
 }
+
+resource "aws_iam_user" "deploy-jsbeeb" {
+  name = "deploy-jsbeeb"
+}
+
+data "aws_iam_policy_document" "bbc-godbolt-org-rw" {
+  statement {
+    sid       = "S3AccessSid"
+    actions   = ["s3:*"]
+    resources = [
+      "${aws_s3_bucket.bbc-godbolt-org.arn}/*",
+      aws_s3_bucket.bbc-godbolt-org.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "deploy-jsbeeb" {
+  name        = "deploy-jsbeeb"
+  description = "Can create resource in bbc.godbolt.org bucket"
+  policy      = data.aws_iam_policy_document.bbc-godbolt-org-rw.json
+}
+
+resource "aws_iam_user_policy_attachment" "deploy-jsbeeb" {
+  user       = aws_iam_user.deploy-jsbeeb.name
+  policy_arn = aws_iam_policy.deploy-jsbeeb.arn
+}
