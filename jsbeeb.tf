@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "bbc-godbolt-org" {
   bucket = "bbc.godbolt.org"
-  acl    = "public"
+  acl    = "public-read"
 
   tags = {
     Site = "jsbeeb"
@@ -116,7 +116,7 @@ resource "aws_cloudfront_distribution" "bbc-godbolt-org" {
   }
 }
 
-// TODO: try removing?
+// I tried, we need this...
 resource "aws_s3_bucket_policy" "bbc-godbolt-org" {
   bucket = aws_s3_bucket.bbc-godbolt-org.bucket
   policy = jsonencode(
