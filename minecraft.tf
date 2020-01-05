@@ -116,9 +116,58 @@ resource "aws_security_group_rule" "EgressToAnywhere" {
   description       = "Allow egress to anywhere"
 }
 
+data "aws_iam_policy_document" "InstanceAssumeRolePolicy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      identifiers = ["ec2.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
+resource "aws_iam_instance_profile" "minecraft" {
+  name = "MinecraftInstance"
+  role = aws_iam_role.minecraft.name
+}
+
+resource "aws_iam_role" "minecraft" {
+  name               = "MinecraftRole"
+  description        = "MinecraftRole node role"
+  assume_role_policy = data.aws_iam_policy_document.InstanceAssumeRolePolicy.json
+}
+
+data "aws_iam_policy_document" "minecraft-backup" {
+  statement {
+    sid       = "S3AccessSid"
+    actions   = ["s3:*"]
+    resources = [
+      "${aws_s3_bucket.minecraft.arn}/*",
+      aws_s3_bucket.minecraft.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "minecraft-backup" {
+  name        = "minecraft-backup"
+  description = "Can read and write the minecraft s3 backup"
+  policy      = data.aws_iam_policy_document.minecraft-backup.json
+}
+
+resource "aws_s3_bucket" "minecraft" {
+  bucket = "minecraft.godbolt.org"
+  acl    = "private"
+}
+
+resource "aws_iam_role_policy_attachment" "minecraft_attach_policy" {
+  role       = aws_iam_role.minecraft.name
+  policy_arn = aws_iam_policy.minecraft-backup.arn
+}
+
 resource "aws_instance" "MinecraftNode" {
   ami                         = "ami-04b9e92b5572fa0d1"
   instance_type               = "t3a.medium"
+  iam_instance_profile        = aws_iam_instance_profile.minecraft.name
   monitoring                  = false
   key_name                    = "mattgodbolt"
   subnet_id                   = aws_subnet.minecraft-1a.id
