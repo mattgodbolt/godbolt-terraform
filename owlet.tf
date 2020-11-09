@@ -1,9 +1,9 @@
-resource "aws_s3_bucket" "beebide-godbolt-org" {
-  bucket = "beebide.godbolt.org"
+resource "aws_s3_bucket" "owlet-godbolt-org" {
+  bucket = "owlet.godbolt.org"
   acl    = "public-read"
 
   tags = {
-    Site = "beebide"
+    Site = "owlet"
   }
 
   website {
@@ -12,20 +12,20 @@ resource "aws_s3_bucket" "beebide-godbolt-org" {
 }
 
 locals {
-  beebide_origin_id = "S3-beebide.godbolt.org"
+  owlet_origin_id = "S3-owlet.godbolt.org"
 }
 
-resource "aws_cloudfront_distribution" "beebide-godbolt-org" {
+resource "aws_cloudfront_distribution" "owlet-godbolt-org" {
   origin {
-    domain_name = aws_s3_bucket.beebide-godbolt-org.bucket_domain_name
-    origin_id   = local.beebide_origin_id
+    domain_name = aws_s3_bucket.owlet-godbolt-org.bucket_domain_name
+    origin_id   = local.owlet_origin_id
   }
 
   enabled             = true
   is_ipv6_enabled     = true
   retain_on_delete    = true
   aliases             = [
-    "beebide.godbolt.org"
+    "owlet.godbolt.org"
   ]
   default_root_object = "index.html"
 
@@ -58,13 +58,13 @@ resource "aws_cloudfront_distribution" "beebide-godbolt-org" {
       }
       query_string = false
     }
-    target_origin_id       = local.beebide_origin_id
+    target_origin_id       = local.owlet_origin_id
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
   }
 
   tags = {
-    Site = "beebide"
+    Site = "owlet"
   }
 
   restrictions {
