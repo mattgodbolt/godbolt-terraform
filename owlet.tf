@@ -1,10 +1,29 @@
+data "aws_iam_policy_document" "owlet-bucket-policy" {
+  statement {
+    principals {
+      identifiers = ["*"]
+      type        = "*"
+    }
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      "arn:aws:s3:::owlet.godbolt.org/*",
+    ]
+  }
+}
+
 resource "aws_s3_bucket" "owlet-godbolt-org" {
   bucket = "owlet.godbolt.org"
-  acl    = "public-read"
+  acl    = "private"
 
   tags = {
     Site = "owlet"
   }
+
+  policy = data.aws_iam_policy_document.owlet-bucket-policy.json
 
   website {
     index_document = "index.html"

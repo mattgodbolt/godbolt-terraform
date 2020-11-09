@@ -172,7 +172,7 @@ resource "aws_instance" "MinecraftNode" {
   key_name                    = "mattgodbolt"
   subnet_id                   = aws_subnet.minecraft-1a.id
   vpc_security_group_ids      = [aws_security_group.minecraft.id]
-  associate_public_ip_address = true
+  associate_public_ip_address = false # set to true to resurrect
   source_dest_check           = true
 
   root_block_device {
