@@ -92,3 +92,30 @@ resource "aws_cloudfront_distribution" "owlet-godbolt-org" {
     }
   }
 }
+
+
+resource "aws_iam_user" "deploy-owlet" {
+  name = "deploy-owlet"
+}
+
+data "aws_iam_policy_document" "owlet-godbolt-org-rw" {
+  statement {
+    sid       = "S3AccessSid"
+    actions   = ["s3:*"]
+    resources = [
+      "${aws_s3_bucket.owlet-godbolt-org.arn}/*",
+      aws_s3_bucket.owlet-godbolt-org.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "deploy-owlet" {
+  name        = "deploy-owlet"
+  description = "Can create resource in owlet.godbolt.org bucket"
+  policy      = data.aws_iam_policy_document.owlet-godbolt-org-rw.json
+}
+
+resource "aws_iam_user_policy_attachment" "deploy-owlet" {
+  user       = aws_iam_user.deploy-owlet.name
+  policy_arn = aws_iam_policy.deploy-owlet.arn
+}
