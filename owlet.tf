@@ -107,6 +107,12 @@ data "aws_iam_policy_document" "owlet-godbolt-org-rw" {
       aws_s3_bucket.owlet-godbolt-org.arn
     ]
   }
+  statement {
+    actions   = ["cloudfront:CreateInvalidation"]
+    resources = [
+      "${aws_cloudfront_distribution.owlet-godbolt-org.arn}/*"
+    ]
+  }
 }
 
 resource "aws_iam_policy" "deploy-owlet" {
