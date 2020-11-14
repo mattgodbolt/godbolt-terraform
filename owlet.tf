@@ -109,9 +109,7 @@ data "aws_iam_policy_document" "owlet-godbolt-org-rw" {
   }
   statement {
     actions   = ["cloudfront:CreateInvalidation"]
-    resources = [
-      "${aws_cloudfront_distribution.owlet-godbolt-org.arn}/*"
-    ]
+    resources = ["*"] # Apparently has to be *
   }
 }
 
