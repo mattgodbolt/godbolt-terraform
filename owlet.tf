@@ -108,6 +108,13 @@ data "aws_iam_policy_document" "owlet-godbolt-org-rw" {
     ]
   }
   statement {
+    sid       = "S3AccessToEditorMicrobotCom"
+    actions   = ["s3:*"]
+    resources = [
+      "arn:aws:s3:::editor.bbcmicrobot.com/*",
+      "arn:aws:s3:::editor.bbcmicrobot.com"]
+  }
+  statement {
     actions   = ["cloudfront:CreateInvalidation"]
     resources = ["*"] # Apparently has to be *
   }
