@@ -108,11 +108,11 @@ data "aws_iam_policy_document" "owlet-godbolt-org-rw" {
     ]
   }
   statement {
-    sid       = "S3AccessToEditorMicrobotCom"
+    sid       = "S3AccessToEditorMicRo"
     actions   = ["s3:*"]
     resources = [
-      "arn:aws:s3:::editor.bbcmicrobot.com/*",
-      "arn:aws:s3:::editor.bbcmicrobot.com"]
+      "arn:aws:s3:::bbcmic.ro/*",
+      "arn:aws:s3:::bbcmic.ro"]
   }
   statement {
     actions   = ["cloudfront:CreateInvalidation"]
