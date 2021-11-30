@@ -8,7 +8,10 @@ data "aws_iam_policy_document" "owlet-s3-access" {
     actions   = ["s3:*"]
     resources = [
       "arn:aws:s3:::bbcmic.ro/*",
-      "arn:aws:s3:::bbcmic.ro"]
+      "arn:aws:s3:::bbcmic.ro",
+      "arn:aws:s3:::virtual.bbcmic.ro/*",
+      "arn:aws:s3:::virtual.bbcmic.ro"
+      ]
   }
 }
 
