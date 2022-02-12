@@ -27,7 +27,7 @@ resource "aws_cloudfront_distribution" "www-xania-org" {
   default_root_object = "index.html"
 
   viewer_certificate {
-    acm_certificate_arn      = "arn:aws:acm:us-east-1:052730242331:certificate/8f8f57bb-8758-404b-9abe-f695e69e48db" //data.aws_acm_certificate.godbolt-org.arn
+    acm_certificate_arn      = data.aws_acm_certificate.xania-org.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.1_2016"
   }
