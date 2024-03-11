@@ -21,10 +21,10 @@ resource "aws_cloudfront_distribution" "beebide-godbolt-org" {
     origin_id   = local.beebide_origin_id
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  retain_on_delete    = true
-  aliases             = [
+  enabled          = true
+  is_ipv6_enabled  = true
+  retain_on_delete = true
+  aliases = [
     "beebide.godbolt.org"
   ]
   default_root_object = "index.html"
@@ -39,7 +39,7 @@ resource "aws_cloudfront_distribution" "beebide-godbolt-org" {
 
   # Main site
   default_cache_behavior {
-    allowed_methods        = [
+    allowed_methods = [
       "HEAD",
       "DELETE",
       "POST",
@@ -48,7 +48,7 @@ resource "aws_cloudfront_distribution" "beebide-godbolt-org" {
       "PUT",
       "PATCH"
     ]
-    cached_methods         = [
+    cached_methods = [
       "HEAD",
       "GET"
     ]

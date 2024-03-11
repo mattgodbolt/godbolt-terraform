@@ -17,10 +17,10 @@ resource "aws_cloudfront_distribution" "www-xania-org" {
     origin_id   = "S3-${aws_s3_bucket.www-xania-org.id}"
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  retain_on_delete    = true
-  aliases             = [
+  enabled          = true
+  is_ipv6_enabled  = true
+  retain_on_delete = true
+  aliases = [
     "*.xania.org",
     "xania.org"
   ]
@@ -35,11 +35,11 @@ resource "aws_cloudfront_distribution" "www-xania-org" {
   http_version = "http2"
 
   default_cache_behavior {
-    allowed_methods        = [
+    allowed_methods = [
       "HEAD",
       "GET",
     ]
-    cached_methods         = [
+    cached_methods = [
       "HEAD",
       "GET"
     ]
@@ -49,7 +49,7 @@ resource "aws_cloudfront_distribution" "www-xania-org" {
       }
       query_string = false
     }
-    target_origin_id       =  "S3-${aws_s3_bucket.www-xania-org.id}"
+    target_origin_id       = "S3-${aws_s3_bucket.www-xania-org.id}"
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
   }
@@ -69,16 +69,16 @@ resource "aws_cloudfront_distribution" "www-xania-org" {
 resource "aws_s3_bucket_policy" "www-xania-org" {
   bucket = aws_s3_bucket.www-xania-org.bucket
   policy = jsonencode(
-  {
-    Statement = [
-      {
-        Action    = "s3:GetObject"
-        Effect    = "Allow"
-        Principal = "*"
-        Resource  = "arn:aws:s3:::www.xania.org/*"
-        Sid       = "PublicReadGetObject"
-      },
-    ]
-    Version   = "2012-10-17"
+    {
+      Statement = [
+        {
+          Action    = "s3:GetObject"
+          Effect    = "Allow"
+          Principal = "*"
+          Resource  = "arn:aws:s3:::www.xania.org/*"
+          Sid       = "PublicReadGetObject"
+        },
+      ]
+      Version = "2012-10-17"
   })
 }

@@ -4,14 +4,14 @@ resource "aws_iam_user" "deploy-owlet" {
 
 data "aws_iam_policy_document" "owlet-s3-access" {
   statement {
-    sid       = "S3AccessToEditorMicRo"
-    actions   = ["s3:*"]
+    sid     = "S3AccessToEditorMicRo"
+    actions = ["s3:*"]
     resources = [
       "arn:aws:s3:::bbcmic.ro/*",
       "arn:aws:s3:::bbcmic.ro",
       "arn:aws:s3:::virtual.bbcmic.ro/*",
       "arn:aws:s3:::virtual.bbcmic.ro"
-      ]
+    ]
   }
 }
 

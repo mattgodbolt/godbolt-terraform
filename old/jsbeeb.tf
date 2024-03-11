@@ -34,10 +34,10 @@ resource "aws_cloudfront_distribution" "bbc-godbolt-org" {
     origin_path = "/beta"
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  retain_on_delete    = true
-  aliases             = [
+  enabled          = true
+  is_ipv6_enabled  = true
+  retain_on_delete = true
+  aliases = [
     "bbc.godbolt.org",
     "master.godbolt.org"
   ]
@@ -54,7 +54,7 @@ resource "aws_cloudfront_distribution" "bbc-godbolt-org" {
 
   # Beta site
   ordered_cache_behavior {
-    allowed_methods        = [
+    allowed_methods = [
       "HEAD",
       "DELETE",
       "POST",
@@ -63,7 +63,7 @@ resource "aws_cloudfront_distribution" "bbc-godbolt-org" {
       "PUT",
       "PATCH"
     ]
-    cached_methods         = [
+    cached_methods = [
       "HEAD",
       "GET"
     ]
@@ -81,7 +81,7 @@ resource "aws_cloudfront_distribution" "bbc-godbolt-org" {
 
   # Main site
   default_cache_behavior {
-    allowed_methods        = [
+    allowed_methods = [
       "HEAD",
       "DELETE",
       "POST",
@@ -90,7 +90,7 @@ resource "aws_cloudfront_distribution" "bbc-godbolt-org" {
       "PUT",
       "PATCH"
     ]
-    cached_methods         = [
+    cached_methods = [
       "HEAD",
       "GET"
     ]
@@ -120,17 +120,17 @@ resource "aws_cloudfront_distribution" "bbc-godbolt-org" {
 resource "aws_s3_bucket_policy" "bbc-godbolt-org" {
   bucket = aws_s3_bucket.bbc-godbolt-org.bucket
   policy = jsonencode(
-  {
-    Statement = [
-      {
-        Action    = "s3:GetObject"
-        Effect    = "Allow"
-        Principal = "*"
-        Resource  = "arn:aws:s3:::bbc.godbolt.org/*"
-        Sid       = "PublicReadGetObject"
-      },
-    ]
-    Version   = "2012-10-17"
+    {
+      Statement = [
+        {
+          Action    = "s3:GetObject"
+          Effect    = "Allow"
+          Principal = "*"
+          Resource  = "arn:aws:s3:::bbc.godbolt.org/*"
+          Sid       = "PublicReadGetObject"
+        },
+      ]
+      Version = "2012-10-17"
   })
 }
 
@@ -140,8 +140,8 @@ resource "aws_iam_user" "deploy-jsbeeb" {
 
 data "aws_iam_policy_document" "bbc-godbolt-org-rw" {
   statement {
-    sid       = "S3AccessSid"
-    actions   = ["s3:*"]
+    sid     = "S3AccessSid"
+    actions = ["s3:*"]
     resources = [
       "${aws_s3_bucket.bbc-godbolt-org.arn}/*",
       aws_s3_bucket.bbc-godbolt-org.arn
