@@ -1,6 +1,5 @@
 resource "aws_s3_bucket" "beebide-xania-org" {
   bucket = "beebide.xania.org"
-  # acl    = "public-read"
 
   tags = {
     Site = "beebide"
@@ -21,10 +20,10 @@ resource "aws_cloudfront_distribution" "beebide-xania-org" {
     origin_id   = local.beebide_origin_id
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  retain_on_delete    = true
-  aliases             = [
+  enabled          = true
+  is_ipv6_enabled  = true
+  retain_on_delete = true
+  aliases = [
     "beebide.xania.org"
   ]
   default_root_object = "index.html"
@@ -39,7 +38,7 @@ resource "aws_cloudfront_distribution" "beebide-xania-org" {
 
   # Main site
   default_cache_behavior {
-    allowed_methods        = [
+    allowed_methods = [
       "HEAD",
       "DELETE",
       "POST",
@@ -48,7 +47,7 @@ resource "aws_cloudfront_distribution" "beebide-xania-org" {
       "PUT",
       "PATCH"
     ]
-    cached_methods         = [
+    cached_methods = [
       "HEAD",
       "GET"
     ]
@@ -72,4 +71,27 @@ resource "aws_cloudfront_distribution" "beebide-xania-org" {
       restriction_type = "none"
     }
   }
+}
+
+// https://stackoverflow.com/questions/76097031/aws-s3-bucket-cannot-have-acls-set-with-objectownerships-bucketownerenforced-s
+resource "aws_s3_bucket_public_access_block" "beebide-xania-org" {
+  bucket              = aws_s3_bucket.beebide-xania-org.bucket
+  block_public_policy = false
+}
+resource "aws_s3_bucket_policy" "beebide-xania-org" {
+  bucket = aws_s3_bucket.beebide-xania-org.bucket
+  policy = jsonencode(
+    {
+      Statement = [
+        {
+          Action    = "s3:GetObject"
+          Effect    = "Allow"
+          Principal = "*"
+          Resource  = "arn:aws:s3:::beebide.xania.org/*"
+          Sid       = "PublicReadGetObject"
+        },
+      ]
+      Version = "2012-10-17"
+  })
+  depends_on = [aws_s3_bucket_public_access_block.beebide-xania-org]
 }

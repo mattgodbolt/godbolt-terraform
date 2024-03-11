@@ -1,6 +1,5 @@
 resource "aws_s3_bucket" "bbc-xania-org" {
   bucket = "bbc.xania.org"
-  # acl    = "public-read"
 
   tags = {
     Site = "jsbeeb"
@@ -34,10 +33,10 @@ resource "aws_cloudfront_distribution" "bbc-xania-org" {
     origin_path = "/beta"
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  retain_on_delete    = true
-  aliases             = [
+  enabled          = true
+  is_ipv6_enabled  = true
+  retain_on_delete = true
+  aliases = [
     "bbc.xania.org",
     "master.xania.org"
   ]
@@ -54,7 +53,7 @@ resource "aws_cloudfront_distribution" "bbc-xania-org" {
 
   # Beta site
   ordered_cache_behavior {
-    allowed_methods        = [
+    allowed_methods = [
       "HEAD",
       "DELETE",
       "POST",
@@ -63,7 +62,7 @@ resource "aws_cloudfront_distribution" "bbc-xania-org" {
       "PUT",
       "PATCH"
     ]
-    cached_methods         = [
+    cached_methods = [
       "HEAD",
       "GET"
     ]
@@ -81,7 +80,7 @@ resource "aws_cloudfront_distribution" "bbc-xania-org" {
 
   # Main site
   default_cache_behavior {
-    allowed_methods        = [
+    allowed_methods = [
       "HEAD",
       "DELETE",
       "POST",
@@ -90,7 +89,7 @@ resource "aws_cloudfront_distribution" "bbc-xania-org" {
       "PUT",
       "PATCH"
     ]
-    cached_methods         = [
+    cached_methods = [
       "HEAD",
       "GET"
     ]
@@ -116,23 +115,28 @@ resource "aws_cloudfront_distribution" "bbc-xania-org" {
   }
 }
 
-# // I tried, we need this...
-# resource "aws_s3_bucket_policy" "bbc-xania-org" {
-#   bucket = aws_s3_bucket.bbc-xania-org.bucket
-#   policy = jsonencode(
-#   {
-#     Statement = [
-#       {
-#         Action    = "s3:GetObject"
-#         Effect    = "Allow"
-#         Principal = "*"
-#         Resource  = "arn:aws:s3:::bbc.xania.org/*"
-#         Sid       = "PublicReadGetObject"
-#       },
-#     ]
-#     Version   = "2012-10-17"
-#   })
-# }
+// https://stackoverflow.com/questions/76097031/aws-s3-bucket-cannot-have-acls-set-with-objectownerships-bucketownerenforced-s
+resource "aws_s3_bucket_public_access_block" "bbc-xania-org" {
+  bucket              = aws_s3_bucket.bbc-xania-org.bucket
+  block_public_policy = false
+  depends_on          = [aws_s3_bucket_public_access_block.bbc-xania-org]
+}
+resource "aws_s3_bucket_policy" "bbc-xania-org" {
+  bucket = aws_s3_bucket.bbc-xania-org.bucket
+  policy = jsonencode(
+    {
+      Statement = [
+        {
+          Action    = "s3:GetObject"
+          Effect    = "Allow"
+          Principal = "*"
+          Resource  = "arn:aws:s3:::bbc.xania.org/*"
+          Sid       = "PublicReadGetObject"
+        },
+      ]
+      Version = "2012-10-17"
+  })
+}
 
 resource "aws_iam_user" "deploy-jsbeeb" {
   name = "deploy-jsbeeb"
@@ -140,8 +144,8 @@ resource "aws_iam_user" "deploy-jsbeeb" {
 
 data "aws_iam_policy_document" "bbc-xania-org-rw" {
   statement {
-    sid       = "S3AccessSid"
-    actions   = ["s3:*"]
+    sid     = "S3AccessSid"
+    actions = ["s3:*"]
     resources = [
       "${aws_s3_bucket.bbc-xania-org.arn}/*",
       aws_s3_bucket.bbc-xania-org.arn

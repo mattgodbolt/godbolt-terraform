@@ -17,11 +17,11 @@ resource "aws_cloudfront_distribution" "www-xania-org" {
     origin_id   = "S3-${aws_s3_bucket.www-xania-org.id}"
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  retain_on_delete    = true
-  aliases             = [
-    "test.xania.org"  # TODO
+  enabled          = true
+  is_ipv6_enabled  = true
+  retain_on_delete = true
+  aliases = [
+    "test.xania.org" # TODO
     # "*.xania.org",
     # "xania.org"
   ]
@@ -36,11 +36,11 @@ resource "aws_cloudfront_distribution" "www-xania-org" {
   http_version = "http2"
 
   default_cache_behavior {
-    allowed_methods        = [
+    allowed_methods = [
       "HEAD",
       "GET",
     ]
-    cached_methods         = [
+    cached_methods = [
       "HEAD",
       "GET"
     ]
@@ -50,7 +50,7 @@ resource "aws_cloudfront_distribution" "www-xania-org" {
       }
       query_string = false
     }
-    target_origin_id       =  "S3-${aws_s3_bucket.www-xania-org.id}"
+    target_origin_id       = "S3-${aws_s3_bucket.www-xania-org.id}"
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
   }
