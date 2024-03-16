@@ -18,7 +18,9 @@ terraform {
   }
   required_providers {
     aws = {
-      version = "~> 2.15"
+      version = "~> 5.41"
     }
   }
 }
+
+data "aws_caller_identity" "this" {}

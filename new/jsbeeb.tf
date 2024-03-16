@@ -11,10 +11,6 @@ resource "aws_s3_bucket" "bbc-xania-org" {
     allowed_origins = ["*"]
     max_age_seconds = 3000
   }
-
-  website {
-    index_document = "index.html"
-  }
 }
 
 locals {
@@ -24,13 +20,15 @@ locals {
 
 resource "aws_cloudfront_distribution" "bbc-xania-org" {
   origin {
-    domain_name = aws_s3_bucket.bbc-xania-org.bucket_domain_name
-    origin_id   = local.jsbeeb_prod_origin_id
+    domain_name              = aws_s3_bucket.bbc-xania-org.bucket_domain_name
+    origin_id                = local.jsbeeb_prod_origin_id
+    origin_access_control_id = aws_cloudfront_origin_access_control.bbc-xania-org.id
   }
   origin {
-    domain_name = aws_s3_bucket.bbc-xania-org.bucket_domain_name
-    origin_id   = local.jsbeeb_beta_origin_id
-    origin_path = "/beta"
+    domain_name              = aws_s3_bucket.bbc-xania-org.bucket_domain_name
+    origin_id                = local.jsbeeb_beta_origin_id
+    origin_access_control_id = aws_cloudfront_origin_access_control.bbc-xania-org.id
+    origin_path              = "/beta"
   }
 
   enabled          = true
@@ -43,7 +41,7 @@ resource "aws_cloudfront_distribution" "bbc-xania-org" {
   default_root_object = "index.html"
 
   viewer_certificate {
-    acm_certificate_arn      = data.aws_acm_certificate.xania-org.arn
+    acm_certificate_arn      = aws_acm_certificate.xania-org.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.1_2016"
   }
@@ -115,28 +113,44 @@ resource "aws_cloudfront_distribution" "bbc-xania-org" {
   }
 }
 
-// https://stackoverflow.com/questions/76097031/aws-s3-bucket-cannot-have-acls-set-with-objectownerships-bucketownerenforced-s
-resource "aws_s3_bucket_public_access_block" "bbc-xania-org" {
-  bucket              = aws_s3_bucket.bbc-xania-org.bucket
-  block_public_policy = false
-  depends_on          = [aws_s3_bucket_public_access_block.bbc-xania-org]
+
+// https://github.com/hashicorp/terraform-provider-aws/issues/30105#issuecomment-1474431141
+resource "aws_cloudfront_origin_access_control" "bbc-xania-org" {
+  name                              = "bbc.xania.org"
+  description                       = "S3 access to cloudfront"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
+data "aws_iam_policy_document" "bbc-xania-org" {
+  statement {
+    sid    = "AllowCloudFrontServicePrincipal"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+    actions   = ["s3:GetObject"]
+    resources = [format("arn:aws:s3:::%s/*", aws_s3_bucket.bbc-xania-org.bucket)]
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values = [
+        format(
+          "arn:aws:cloudfront::%s:distribution/%s",
+          data.aws_caller_identity.this.account_id,
+          aws_cloudfront_distribution.bbc-xania-org.id
+        )
+      ]
+    }
+  }
 }
 resource "aws_s3_bucket_policy" "bbc-xania-org" {
   bucket = aws_s3_bucket.bbc-xania-org.bucket
-  policy = jsonencode(
-    {
-      Statement = [
-        {
-          Action    = "s3:GetObject"
-          Effect    = "Allow"
-          Principal = "*"
-          Resource  = "arn:aws:s3:::bbc.xania.org/*"
-          Sid       = "PublicReadGetObject"
-        },
-      ]
-      Version = "2012-10-17"
-  })
+  policy = data.aws_iam_policy_document.bbc-xania-org.json
 }
+
 
 resource "aws_iam_user" "deploy-jsbeeb" {
   name = "deploy-jsbeeb"
