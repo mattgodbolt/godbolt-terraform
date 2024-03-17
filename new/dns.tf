@@ -40,6 +40,14 @@ resource "aws_route53_record" "acm" {
 # #   records = ["168.91.230.10"]
 # # }
 
+resource "aws_route53_record" "mud" {
+  zone_id = aws_route53_zone.xania.zone_id
+  name = "mud"
+  type = "A"
+  records = [ "18.215.174.238"]
+  ttl = 3600
+}
+
 resource "aws_route53_record" "beebide" {
   for_each = {
     a    = "A"

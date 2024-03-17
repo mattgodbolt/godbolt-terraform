@@ -4,7 +4,10 @@ resource "aws_s3_bucket" "bbc-xania-org" {
   tags = {
     Site = "jsbeeb"
   }
+}
 
+resource "aws_s3_bucket_cors_configuration" "bbc-xania-org" {
+  bucket = aws_s3_bucket.bbc-xania-org.id
   cors_rule {
     allowed_headers = ["Authorization"]
     allowed_methods = ["GET"]
@@ -169,7 +172,7 @@ data "aws_iam_policy_document" "bbc-xania-org-rw" {
 
 resource "aws_iam_policy" "deploy-jsbeeb" {
   name        = "deploy-jsbeeb"
-  description = "Can create resource in bbc.xania.org bucket"
+  description = "Can create resources in bbc.xania.org bucket"
   policy      = data.aws_iam_policy_document.bbc-xania-org-rw.json
 }
 
