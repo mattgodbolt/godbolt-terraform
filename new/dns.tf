@@ -63,52 +63,6 @@ resource "aws_route53_record" "beebide" {
   }
 }
 
-resource "aws_route53_record" "jsbeeb" {
-  for_each = {
-    a    = "A"
-    aaaa = "AAAA"
-  }
-  zone_id = aws_route53_zone.xania.zone_id
-  name    = "bbc.xania.org"
-  type    = each.value
-  alias {
-    name                   = aws_cloudfront_distribution.bbc-xania-org.domain_name
-    zone_id                = aws_cloudfront_distribution.bbc-xania-org.hosted_zone_id
-    evaluate_target_health = false
-  }
-}
-
-resource "aws_route53_record" "jsbeeb-master" {
-  zone_id = aws_route53_zone.xania.zone_id
-  name    = "master"
-  type    = "CNAME"
-  records = ["bbc.xania.org"]
-  ttl     = 360
-}
-
-resource "aws_route53_record" "address" {
-  for_each = {
-    a    = "A"
-    aaaa = "AAAA"
-  }
-  zone_id = aws_route53_zone.xania.zone_id
-  name    = "xania.org"
-  type    = each.value
-  alias {
-    name                   = aws_cloudfront_distribution.www-xania-org.domain_name
-    zone_id                = aws_cloudfront_distribution.www-xania-org.hosted_zone_id
-    evaluate_target_health = false
-  }
-}
-
-
-resource "aws_route53_record" "wildcard" {
-  zone_id = aws_route53_zone.xania.zone_id
-  name    = "*"
-  type    = "CNAME"
-  records = [aws_route53_record.address["a"].fqdn]
-  ttl     = 360
-}
 
 resource "aws_route53_record" "spf" {
   zone_id = aws_route53_zone.xania.zone_id
