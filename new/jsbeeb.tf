@@ -177,3 +177,16 @@ resource "aws_iam_user_policy_attachment" "deploy-jsbeeb" {
   user       = aws_iam_user.deploy-jsbeeb.name
   policy_arn = aws_iam_policy.deploy-jsbeeb.arn
 }
+
+resource "aws_iam_access_key" "deploy-jsbeeb" {
+  user = aws_iam_user.deploy-jsbeeb.name
+}
+
+output "deploy_jsbeeb_id" {
+  value = aws_iam_access_key.deploy-jsbeeb.id
+}
+
+output "deploy_jsbeeb_secret" {
+  value     = aws_iam_access_key.deploy-jsbeeb.secret
+  sensitive = true
+}
