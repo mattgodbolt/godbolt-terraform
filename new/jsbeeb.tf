@@ -1,4 +1,4 @@
-module jsbeeb {
+module "jsbeeb" {
   source = "./website"
   bucket = "bbc.xania.org"
   aliases = [

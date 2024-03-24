@@ -1,4 +1,4 @@
-module miracle {
+module "miracle" {
   source = "./website"
   bucket = "miracle.xania.org"
   aliases = [

@@ -1,4 +1,4 @@
-module blog {
+module "blog" {
   source = "./website"
   bucket = "web.xania.org"
   aliases = [
