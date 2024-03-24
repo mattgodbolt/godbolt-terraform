@@ -1,11 +1,11 @@
 provider "aws" {
   region  = "us-east-2"
-  profile = "personal"
+  profile = "xania"
 }
 provider "aws" {
   alias   = "virginia"
   region  = "us-east-1"
-  profile = "personal"
+  profile = "xania"
 }
 
 terraform {
@@ -14,7 +14,7 @@ terraform {
     bucket  = "terraform.xania.org"
     key     = "godbolt.tfstate"
     region  = "us-east-2"
-    profile = "personal"
+    profile = "xania"
   }
   required_providers {
     aws = {
