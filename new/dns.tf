@@ -64,7 +64,8 @@ resource "aws_route53_record" "spf" {
   records = [
     "v=spf1 include:_spf.google.com ~all",
     "v=DMARC1;p=none;sp=quarantine;rua=mailto:matt+dmarc@xania.org",
-    "google-site-verification=uCqzvXJNW3IV25ZPjOmXyrTBA_dwzpo57znHNWU11s0"
+    "google-site-verification=uCqzvXJNW3IV25ZPjOmXyrTBA_dwzpo57znHNWU11s0",
+    "google-site-verification=tU6ILlM2LbgGe0MLMVVGSe5IOVo8kPBbms10x1uXnZs"
   ]
 }
 
