@@ -42,14 +42,14 @@ resource "aws_iam_user_policy_attachment" "smtp_user" {
 }
 
 resource "aws_ssm_parameter" "smtp_user" {
-  name = "smtp_user"
-  type = "String"
+  name  = "smtp_user"
+  type  = "String"
   value = aws_iam_access_key.smtp_user.id
 }
 
 resource "aws_ssm_parameter" "smtp_password" {
-  name = "smtp_password"
-  type = "String"
+  name  = "smtp_password"
+  type  = "String"
   value = aws_iam_access_key.smtp_user.ses_smtp_password_v4
 }
 

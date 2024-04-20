@@ -1,11 +1,11 @@
 variable "bucket" {
-    description = "The S3 bucket to store in"
-    type = string
+  description = "The S3 bucket to store in"
+  type        = string
 }
 
 variable "deploy_user" {
-    description = "Username of the IAM user to deploy"
-    type = string
+  description = "Username of the IAM user to deploy"
+  type        = string
 }
 
 variable "tags" {

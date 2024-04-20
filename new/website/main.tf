@@ -2,19 +2,19 @@ data "aws_caller_identity" "this" {}
 
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket
-  tags = var.tags
+  tags   = var.tags
 }
 
 
- resource "aws_s3_bucket_cors_configuration" "cors" {
-   bucket = aws_s3_bucket.bucket.id
-   cors_rule {
-     allowed_headers = ["Authorization"]
-     allowed_methods = ["GET"]
-     allowed_origins = ["*"]
-     max_age_seconds = 3000
-   }
- }
+resource "aws_s3_bucket_cors_configuration" "cors" {
+  bucket = aws_s3_bucket.bucket.id
+  cors_rule {
+    allowed_headers = ["Authorization"]
+    allowed_methods = ["GET"]
+    allowed_origins = ["*"]
+    max_age_seconds = 3000
+  }
+}
 
 resource "aws_cloudfront_distribution" "distribution" {
   origin {
@@ -23,10 +23,10 @@ resource "aws_cloudfront_distribution" "distribution" {
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
   }
 
-  enabled          = true
-  is_ipv6_enabled  = true
-  retain_on_delete = false
-  aliases = var.aliases
+  enabled             = true
+  is_ipv6_enabled     = true
+  retain_on_delete    = false
+  aliases             = var.aliases
   default_root_object = "index.html"
 
   viewer_certificate {
@@ -119,11 +119,21 @@ data "aws_iam_policy_document" "policy-rw" {
       aws_s3_bucket.bucket.arn
     ]
   }
+  statement {
+    sid     = "AllowInvalidation"
+    actions = ["cloudfront:CreateInvalidation"]
+    resources = [
+      format(
+        "arn:aws:cloudfront::%s:distribution/%s",
+        data.aws_caller_identity.this.account_id,
+        aws_cloudfront_distribution.distribution.id
+    )]
+  }
 }
 
 resource "aws_iam_policy" "deploy" {
   name        = var.deploy_user
-  description = format("Can create resources in %s bucket", var.bucket)
+  description = format("Can create resources in %s bucket and invalidate distribution %s", var.bucket, aws_cloudfront_distribution.distribution.id)
   policy      = data.aws_iam_policy_document.policy-rw.json
 }
 
