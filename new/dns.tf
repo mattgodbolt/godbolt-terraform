@@ -63,6 +63,18 @@ resource "aws_route53_record" "beebide" {
   }
 }
 
+// https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site
+resource "aws_route53_record" "slides" {
+  for_each = {
+    old-dog-new-tricks = "old-dog-new-tricks"
+  }
+  zone_id = aws_route53_zone.xania.zone_id
+  name    = "${each.value}.xania.org"
+  type    = "CNAME"
+  ttl     = 3600
+  records = ["mattgodbolt.github.io"]
+}
+
 
 resource "aws_route53_record" "spf" {
   zone_id = aws_route53_zone.xania.zone_id

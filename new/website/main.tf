@@ -16,6 +16,25 @@ resource "aws_s3_bucket_cors_configuration" "cors" {
   }
 }
 
+resource "aws_cloudfront_response_headers_policy" "cors_policy" {
+  name = "CORSPolicy-${replace(var.bucket, ".", "-")}"
+
+  cors_config {
+    access_control_allow_credentials = false
+    access_control_allow_origins {
+      items = ["*"]
+    }
+    access_control_allow_methods {
+      items = ["GET", "HEAD", "OPTIONS"]
+    }
+    access_control_allow_headers {
+      items = ["*"]
+    }
+    origin_override            = true
+    access_control_max_age_sec = 3000
+  }
+}
+
 resource "aws_cloudfront_distribution" "distribution" {
   origin {
     domain_name              = aws_s3_bucket.bucket.bucket_regional_domain_name
@@ -41,6 +60,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     allowed_methods = [
       "HEAD",
       "GET",
+      "OPTIONS"
     ]
     cached_methods = [
       "HEAD",
@@ -52,9 +72,10 @@ resource "aws_cloudfront_distribution" "distribution" {
       }
       query_string = false
     }
-    target_origin_id       = "S3-${aws_s3_bucket.bucket.id}"
-    viewer_protocol_policy = "redirect-to-https"
-    compress               = true
+    target_origin_id           = "S3-${aws_s3_bucket.bucket.id}"
+    viewer_protocol_policy     = "redirect-to-https"
+    compress                   = true
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.cors_policy.id
   }
 
   tags = var.tags
