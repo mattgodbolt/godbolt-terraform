@@ -48,6 +48,14 @@ resource "aws_route53_record" "phoenix" {
   records = ["192.168.7.240"]
 }
 
+resource "aws_route53_record" "naboo" {
+  name    = "naboo"
+  zone_id = aws_route53_zone.xania.zone_id
+  type    = "A"
+  ttl     = 360
+  records = ["192.168.7.236"]
+}
+
 resource "aws_route53_record" "beebide" {
   for_each = {
     a    = "A"
