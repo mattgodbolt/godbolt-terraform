@@ -3,7 +3,8 @@ module "jsbeeb" {
   bucket = "bbc.xania.org"
   aliases = [
     "bbc.xania.org",
-    "master.xania.org"
+    "master.xania.org",
+    "atom.xania.org"
   ]
   deploy_user = "deploy-jsbeeb"
   tags = {
@@ -39,6 +40,14 @@ resource "aws_route53_record" "jsbeeb" {
 resource "aws_route53_record" "jsbeeb-master" {
   zone_id = aws_route53_zone.xania.zone_id
   name    = "master"
+  type    = "CNAME"
+  records = ["bbc.xania.org"]
+  ttl     = 360
+}
+
+resource "aws_route53_record" "jsbeeb-atom" {
+  zone_id = aws_route53_zone.xania.zone_id
+  name    = "atom"
   type    = "CNAME"
   records = ["bbc.xania.org"]
   ttl     = 360
