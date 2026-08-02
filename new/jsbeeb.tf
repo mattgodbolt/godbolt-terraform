@@ -11,6 +11,11 @@ module "jsbeeb" {
     Site = "jsbeeb"
   }
   certificate = aws_acm_certificate.xania-org.arn
+  // archive/ holds the mirrored Stairway to Hell software archive, which is
+  // scraped from a third-party site rather than built from the repo. The deploy
+  // may refresh it, but must never delete from it. See jsbeeb's
+  // tools/README-sth-mirror.md.
+  protected_prefixes = ["archive/*"]
 }
 
 output "deploy_jsbeeb_id" {

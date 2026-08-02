@@ -150,6 +150,20 @@ data "aws_iam_policy_document" "policy-rw" {
         aws_cloudfront_distribution.distribution.id
     )]
   }
+
+  // An explicit Deny beats the s3:* Allow above, so the deploy user keeps full
+  // write access to these prefixes — it can still overwrite and add objects —
+  // but cannot delete from them. Guards content that isn't rebuilt from the
+  // repo against an `aws s3 sync --delete` aimed at the wrong destination.
+  dynamic "statement" {
+    for_each = length(var.protected_prefixes) > 0 ? [1] : []
+    content {
+      sid       = "ProtectPrefixesFromDeletion"
+      effect    = "Deny"
+      actions   = ["s3:DeleteObject", "s3:DeleteObjectVersion"]
+      resources = [for prefix in var.protected_prefixes : "${aws_s3_bucket.bucket.arn}/${prefix}"]
+    }
+  }
 }
 
 resource "aws_iam_policy" "deploy" {

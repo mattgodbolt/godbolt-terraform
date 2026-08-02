@@ -24,3 +24,9 @@ variable "certificate" {
   description = "ARN of certificate to use"
   type        = string
 }
+
+variable "protected_prefixes" {
+  default     = []
+  description = "Key prefixes (S3 wildcards, e.g. \"archive/*\") the deploy user may write to but never delete from"
+  type        = list(string)
+}
