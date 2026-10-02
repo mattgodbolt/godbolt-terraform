@@ -30,3 +30,12 @@ variable "protected_prefixes" {
   description = "Key prefixes (S3 wildcards, e.g. \"archive/*\") the deploy user may write to but never delete from"
   type        = list(string)
 }
+
+variable "api_origins" {
+  default     = []
+  description = "Uncached origins served under a path pattern of the distribution, e.g. a Lambda function URL at /api/foo/*"
+  type = list(object({
+    path_pattern = string
+    domain_name  = string
+  }))
+}

@@ -16,6 +16,10 @@ module "jsbeeb" {
   // may refresh it, but must never delete from it. See jsbeeb's
   // tools/README-sth-mirror.md.
   protected_prefixes = ["archive/*"]
+  api_origins = [{
+    path_pattern = "/api/rendezvous/*"
+    domain_name  = trimsuffix(trimprefix(aws_lambda_function_url.jsbeeb_rendezvous.function_url, "https://"), "/")
+  }]
 }
 
 output "deploy_jsbeeb_id" {

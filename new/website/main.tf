@@ -1,5 +1,13 @@
 data "aws_caller_identity" "this" {}
 
+data "aws_cloudfront_cache_policy" "disabled" {
+  name = "Managed-CachingDisabled"
+}
+
+data "aws_cloudfront_origin_request_policy" "all_viewer_except_host" {
+  name = "Managed-AllViewerExceptHostHeader"
+}
+
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket
   tags   = var.tags
@@ -40,6 +48,36 @@ resource "aws_cloudfront_distribution" "distribution" {
     domain_name              = aws_s3_bucket.bucket.bucket_regional_domain_name
     origin_id                = "S3-${aws_s3_bucket.bucket.id}"
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
+  }
+
+  dynamic "origin" {
+    for_each = var.api_origins
+    content {
+      domain_name = origin.value.domain_name
+      origin_id   = "api-${origin.value.path_pattern}"
+      custom_origin_config {
+        http_port              = 80
+        https_port             = 443
+        origin_protocol_policy = "https-only"
+        origin_ssl_protocols   = ["TLSv1.2"]
+      }
+    }
+  }
+
+  // A Lambda function URL rejects a Host header that isn't its own, hence
+  // AllViewerExceptHostHeader.
+  dynamic "ordered_cache_behavior" {
+    for_each = var.api_origins
+    content {
+      path_pattern             = ordered_cache_behavior.value.path_pattern
+      target_origin_id         = "api-${ordered_cache_behavior.value.path_pattern}"
+      allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+      cached_methods           = ["GET", "HEAD"]
+      cache_policy_id          = data.aws_cloudfront_cache_policy.disabled.id
+      origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer_except_host.id
+      viewer_protocol_policy   = "https-only"
+      compress                 = true
+    }
   }
 
   enabled             = true

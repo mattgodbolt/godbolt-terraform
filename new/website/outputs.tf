@@ -14,3 +14,7 @@ output "deploy_secret" {
   value     = aws_iam_access_key.deploy.secret
   sensitive = true
 }
+
+output "deploy_user" {
+  value = aws_iam_user.deploy.name
+}

@@ -30,10 +30,12 @@ resource "aws_s3_bucket" "music" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "music" {
-  bucket = aws_s3_bucket.music.bucket
+  transition_default_minimum_object_size = "varies_by_storage_class"
+  bucket                                 = aws_s3_bucket.music.bucket
   rule {
     id     = "ensure_intelligent"
     status = "Enabled"
+    filter {}
     transition {
       days          = 0
       storage_class = "INTELLIGENT_TIERING"
@@ -46,10 +48,12 @@ resource "aws_s3_bucket" "videos" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "videos" {
-  bucket = aws_s3_bucket.videos.bucket
+  transition_default_minimum_object_size = "varies_by_storage_class"
+  bucket                                 = aws_s3_bucket.videos.bucket
   rule {
     id     = "ensure_intelligent"
     status = "Enabled"
+    filter {}
     transition {
       days          = 0
       storage_class = "INTELLIGENT_TIERING"
