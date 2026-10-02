@@ -82,7 +82,9 @@ resource "aws_lambda_function" "jsbeeb_rendezvous" {
   handler       = "index.handler"
   memory_size   = 128
   timeout       = 5
-  filename      = data.archive_file.jsbeeb_rendezvous_placeholder.output_path
+  // A handful of rendezvous at once is plenty; this caps what a flood can spend.
+  reserved_concurrent_executions = 5
+  filename                       = data.archive_file.jsbeeb_rendezvous_placeholder.output_path
 
   environment {
     variables = {
