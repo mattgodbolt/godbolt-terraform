@@ -14,8 +14,8 @@ module "jsbeeb" {
   // archive/ holds the mirrored Stairway to Hell software archive, which is
   // scraped from a third-party site rather than built from the repo. The deploy
   // may refresh it, but must never delete from it. See jsbeeb's
-  // tools/README-sth-mirror.md.
-  protected_prefixes = ["archive/*"]
+  // tools/README-sth-mirror.md. meta/ is beeb-meta-data's (beeb-meta-data.tf).
+  protected_prefixes = ["archive/*", "meta/*"]
   api_origins = [{
     path_pattern = "/api/rendezvous/*"
     domain_name  = trimsuffix(trimprefix(aws_lambda_function_url.jsbeeb_rendezvous.function_url, "https://"), "/")
