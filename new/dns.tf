@@ -48,6 +48,15 @@ resource "aws_route53_record" "phoenix" {
   records = ["192.168.7.240"]
 }
 
+# Grade tracker dashboard on phoenix (nginx picks the site by Host header).
+resource "aws_route53_record" "grades" {
+  name    = "grades"
+  zone_id = aws_route53_zone.xania.zone_id
+  type    = "CNAME"
+  ttl     = 3600
+  records = ["phoenix.xania.org"]
+}
+
 resource "aws_route53_record" "naboo" {
   name    = "naboo"
   zone_id = aws_route53_zone.xania.zone_id
