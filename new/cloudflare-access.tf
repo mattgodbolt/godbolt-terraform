@@ -78,3 +78,31 @@ resource "cloudflare_zero_trust_access_application" "wildcard" {
     { id = cloudflare_zero_trust_access_policy.godbolt_org.id, precedence = 1 },
   ]
 }
+
+# nudge is for Matt only: a more specific application than the wildcard, so its policy replaces the org-wide one.
+resource "cloudflare_zero_trust_access_policy" "matt_only" {
+  account_id = local.cloudflare_account_id
+  name       = "Matt only"
+  decision   = "allow"
+  include = [
+    { email = { email = "matt@godbolt.org" } },
+  ]
+}
+
+resource "cloudflare_zero_trust_access_application" "nudge" {
+  account_id                = local.cloudflare_account_id
+  name                      = "nudge"
+  domain                    = "nudge.godbolt.net"
+  type                      = "self_hosted"
+  session_duration          = "720h"
+  allowed_idps              = [cloudflare_zero_trust_access_identity_provider.google.id]
+  auto_redirect_to_identity = true
+  policies = [
+    { id = cloudflare_zero_trust_access_policy.matt_only.id, precedence = 1 },
+  ]
+}
+
+# The JWT audience for nudge's server-side verification of Cf-Access-Jwt-Assertion.
+output "nudge_access_aud" {
+  value = cloudflare_zero_trust_access_application.nudge.aud
+}
