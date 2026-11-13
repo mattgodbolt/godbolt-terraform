@@ -13,6 +13,8 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "phoenix" {
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.phoenix.id
   config = {
     ingress = [
+      # nudge listens on loopback only, so go straight to it: no LAN-reachable hop where headers could be forged.
+      { hostname = "nudge.godbolt.net", service = "http://localhost:4517" },
       { hostname = "*.godbolt.net", service = "http://localhost:80" },
       { service = "http_status:404" },
     ]
