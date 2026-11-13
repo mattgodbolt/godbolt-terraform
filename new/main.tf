@@ -20,7 +20,17 @@ terraform {
     aws = {
       version = "~> 5.41"
     }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 5.0"
+    }
   }
+}
+
+# The token lives in a chmod 600 file outside the repo rather than in the environment.
+# Scoped to the Cloudflare account's Tunnel/Access and the godbolt.net zone only.
+provider "cloudflare" {
+  api_token = trimspace(file(pathexpand("~/.config/cloudflare/terraform-token")))
 }
 
 data "aws_caller_identity" "this" {}
