@@ -108,3 +108,40 @@ resource "cloudflare_zero_trust_access_application" "nudge" {
 output "nudge_access_aud" {
   value = cloudflare_zero_trust_access_application.nudge.aud
 }
+
+# A browser fetches the PWA manifest, service worker and icons without credentials, so Access would redirect them to
+# the login page and break "install". These exact paths bypass Access; nudge itself serves only these (GET/HEAD) to
+# the Access host without a verified token (ACCESS_PUBLIC_PATHS in nudge's server/security.ts) and rejects the rest.
+locals {
+  nudge_public_paths = [
+    "/manifest.webmanifest",
+    "/sw.js",
+    "/favicon.svg",
+    "/icon-192.png",
+    "/icon-512.png",
+    "/icon-maskable-512.png",
+    "/badge-96.png",
+    "/logo-120.png",
+  ]
+}
+
+resource "cloudflare_zero_trust_access_policy" "public_bypass" {
+  account_id = local.cloudflare_account_id
+  name       = "Public static files"
+  decision   = "bypass"
+  include = [
+    { everyone = {} },
+  ]
+}
+
+resource "cloudflare_zero_trust_access_application" "nudge_public" {
+  account_id = local.cloudflare_account_id
+  name       = "nudge static files"
+  type       = "self_hosted"
+  destinations = [
+    for p in local.nudge_public_paths : { type = "public", uri = "nudge.godbolt.net${p}" }
+  ]
+  policies = [
+    { id = cloudflare_zero_trust_access_policy.public_bypass.id, precedence = 1 },
+  ]
+}
