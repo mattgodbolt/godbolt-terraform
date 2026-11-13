@@ -1,0 +1,20 @@
+# Runs on phoenix (~/edge). The tunnel token is in a gitignored, chmod 600 .env next to this file
+# (TUNNEL_TOKEN=..., from `terraform output -raw phoenix_tunnel_token` in ../new).
+# cloudflared uses the host network so its ingress target http://localhost:80 is phoenix's nginx, which routes by Host.
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    network_mode: host
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+
+  # Test app: echoes the request headers, including what Cloudflare Access adds after login.
+  whoami:
+    image: traefik/whoami:latest
+    container_name: whoami
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8081:80'
