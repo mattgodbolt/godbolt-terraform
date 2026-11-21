@@ -65,6 +65,15 @@ resource "aws_route53_record" "naboo" {
   records = ["192.168.7.236"]
 }
 
+# NUC under the lounge TV (DHCP reservation on the eero). Phone remote on :8090.
+resource "aws_route53_record" "tvbox" {
+  name    = "tvbox"
+  zone_id = aws_route53_zone.xania.zone_id
+  type    = "A"
+  ttl     = 3600
+  records = ["192.168.7.224"]
+}
+
 resource "aws_route53_record" "beebide" {
   for_each = {
     a    = "A"
